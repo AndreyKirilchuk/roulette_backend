@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Exceptions\API\Auth\UnauthorizedException;
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CheckToken
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $access_token = $request->cookie('access_token');
+
+        try{
+            $user = JWTAuth::setToken($access_token)->authenticate();
+
+            if(!$user) throw new UnauthorizedException();
+        }catch (JWTException $e){
+            throw new UnauthorizedException();
+        }
+
+        auth()->login($user);
+
+        return $next($request);
+    }
+}
