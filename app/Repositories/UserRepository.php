@@ -8,7 +8,7 @@ class UserRepository
 {
     public function findUserByTelegramId($telegramId)
     {
-        return User::query()->where('telegram_id', $telegramId)->firstOrFail();
+        return User::query()->where('telegram_id', $telegramId)->first();
     }
 
     public function create($data)
@@ -24,6 +24,6 @@ class UserRepository
 
     public function findByRefreshToken($refresh_token)
     {
-        return User::query()->where('refresh_token', $refresh_token)->firstOrFail();
+        return User::query()->where('refresh_token', $refresh_token)->first();
     }
 }

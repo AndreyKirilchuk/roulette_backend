@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->timestamp('auth_date')->nullable();
             $table->string('refresh_token');
-            $table->timestamp('refresh_token_expires_at');
+            $table->timestamp('refresh_token_expires_at')->nullable();
             $table->timestamps();
         });
     }

@@ -20,6 +20,6 @@ Route::middleware('CheckToken')->group(function () {
     Route::get('/check', [AuthController::class, 'get']);
 });
 
-Route::get('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/refresh', [AuthController::class, 'refresh']);

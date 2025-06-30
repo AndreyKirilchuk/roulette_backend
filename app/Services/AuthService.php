@@ -6,13 +6,16 @@ use App\DTOs\AuthTelegramDTO;
 use App\Exceptions\Api\Auth\InvalidRefreshTokenException;
 use App\Exceptions\API\Auth\UnauthorizedException;
 use App\Repositories\UserRepository;
+use Azate\LaravelTelegramLoginAuth\TelegramLoginAuth;
+use Exception;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
     public function __construct(
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly TelegramLoginAuth $telegramLoginAuth
     ) {}
 
     public function checkTelegramHash($initData)
@@ -21,6 +24,11 @@ class AuthService
 
         // Разобрать строку
         parse_str($initData, $data);
+
+        // Проверка наличия hash
+        if (!isset($data['hash'])) {
+            return response()->json(['error' => 'Hash not found'], 401);
+        }
 
         // Проверка подписи
         $hash = $data['hash'];
@@ -40,12 +48,17 @@ class AuthService
             return response()->json(['error' => 'Invalid Telegram hash'], 401);
         }
 
+        // Проверяем наличие данных пользователя
+        if (!isset($data['user'])) {
+            return response()->json(['error' => 'User data not found'], 401);
+        }
+
         return json_decode($data['user'], true);
     }
 
-    public function login($initData)
+    public function login($requestData)
     {
-        $userData = $this->checkTelegramHash($initData);
+        $userData = $this->checkTelegramHash($requestData['initData']);
 
         $user = $this->userRepository->findUserByTelegramId($userData["id"]);
 
