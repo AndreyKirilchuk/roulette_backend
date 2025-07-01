@@ -6,7 +6,6 @@ use App\DTOs\AuthTelegramDTO;
 use App\Exceptions\Api\Auth\InvalidRefreshTokenException;
 use App\Exceptions\API\Auth\UnauthorizedException;
 use App\Repositories\UserRepository;
-use Azate\LaravelTelegramLoginAuth\TelegramLoginAuth;
 use Exception;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -14,8 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AuthService
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly TelegramLoginAuth $telegramLoginAuth
+        private readonly UserRepository $userRepository
     ) {}
 
     public function checkTelegramHash($initData)
