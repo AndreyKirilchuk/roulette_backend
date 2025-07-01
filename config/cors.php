@@ -15,11 +15,12 @@ return [
     |
     */
 
-    'paths' => ['*'],
+
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'refresh'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://roulette.buymysite.ru', 'http://localhost:5173'],
 
     'allowed_origins_patterns' => [],
 
@@ -29,6 +30,5 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
-
+    'supports_credentials' => true,
 ];

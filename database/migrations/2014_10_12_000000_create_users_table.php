@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->bigInteger('telegram_id')->unique();
             $table->string('name')->nullable();
             $table->string('username')->nullable();
             $table->string('avatar')->nullable();
-            $table->timestamp('auth_date')->nullable();
-            $table->string('refresh_token');
+            $table->string('auth_date');
+            $table->string('refresh_token')->nullable();
             $table->timestamp('refresh_token_expires_at')->nullable();
+            $table->bigInteger('count_rotation')->default(0);
             $table->timestamps();
         });
     }

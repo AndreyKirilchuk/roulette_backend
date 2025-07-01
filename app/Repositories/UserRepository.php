@@ -19,7 +19,7 @@ class UserRepository
 
     public function update($user, $data)
     {
-        return $user->update($data)->refresh();
+        return $user->update($data);
     }
 
     public function findByRefreshToken($refresh_token)

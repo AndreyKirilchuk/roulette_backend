@@ -6,6 +6,8 @@ use App\Exceptions\API\Auth\UnauthorizedException;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CheckToken
 {

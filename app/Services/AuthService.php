@@ -7,6 +7,7 @@ use App\Exceptions\Api\Auth\InvalidRefreshTokenException;
 use App\Exceptions\API\Auth\UnauthorizedException;
 use App\Repositories\UserRepository;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -18,45 +19,61 @@ class AuthService
 
     public function checkTelegramHash($initData)
     {
-        $botToken = env('TELEGRAM_BOT_TOKEN');
+        // 1. Разбираем строку на параметры
+        parse_str($initData, $receivedData);
 
-        // Разобрать строку
-        parse_str($initData, $data);
-
-        // Проверка наличия hash
-        if (!isset($data['hash'])) {
-            return response()->json(['error' => 'Hash not found'], 401);
+        // 2. Проверяем наличие обязательных полей
+        if (!isset($receivedData['hash'], $receivedData['auth_date'], $receivedData['user'])) {
+            throw new Exception('Invalid initData: missing required fields');
         }
 
-        // Проверка подписи
-        $hash = $data['hash'];
-        unset($data['hash']);
+        // 3. Извлекаем hash для дальнейшей проверки
+        $receivedHash = $receivedData['hash'];
+        unset($receivedData['hash']); // Убираем hash из данных для проверки
 
-        ksort($data);
-        $checkString = '';
-        foreach ($data as $k => $v) {
-            $checkString .= "$k=$v\n";
+        // 4. Сортируем поля по алфавиту и формируем data_check_string
+        ksort($receivedData);
+        $dataCheckString = [];
+        foreach ($receivedData as $key => $value) {
+            $dataCheckString[] = "$key=$value";
         }
-        $checkString = rtrim($checkString, "\n");
+        $dataCheckString = implode("\n", $dataCheckString);
 
-        $secretKey = hash('sha256', $botToken, true);
-        $calculatedHash = hash_hmac('sha256', $checkString, $secretKey);
+        // 5. Генерируем секретный ключ (HMAC-SHA-256 от токена бота + "WebAppData")
+        $secretKey = hash_hmac(
+            'sha256',
+            getenv('TELEGRAM_BOT_TOKEN'), // Токен бота из переменных окружения
+            'WebAppData',
+            true
+        );
 
-        if (!hash_equals($calculatedHash, $hash)) {
-            return response()->json(['error' => 'Invalid Telegram hash'], 401);
+        // 6. Считаем HMAC-SHA-256 от data_check_string
+        $calculatedHash = bin2hex(
+            hash_hmac('sha256', $dataCheckString, $secretKey, true)
+        );
+
+        // 7. Сравниваем полученный hash и вычисленный
+        if (!hash_equals($calculatedHash, $receivedHash)) {
+            throw new Exception('Invalid initData: hash mismatch');
         }
 
-        // Проверяем наличие данных пользователя
-        if (!isset($data['user'])) {
-            return response()->json(['error' => 'User data not found'], 401);
+        // 8. Проверяем, что данные не устарели (например, не старше 1 дня)
+        $authDate = (int)$receivedData['auth_date'];
+        if (time() - $authDate > 86400) {
+            throw new Exception('initData is too old');
         }
 
-        return json_decode($data['user'], true);
+        // 9. Декодируем user (если нужно)
+        $receivedData['user'] = json_decode($receivedData['user'], true);
+
+        return $receivedData;
     }
 
     public function login($requestData)
     {
-        $userData = $this->checkTelegramHash($requestData['initData']);
+        $initData = $this->checkTelegramHash($requestData['initData']);
+
+        $userData = $initData['user'];
 
         $user = $this->userRepository->findUserByTelegramId($userData["id"]);
 
@@ -81,14 +98,16 @@ class AuthService
 
     public function register($requestData)
     {
-        $userData = $this->checkTelegramHash($requestData['initData']);
+        $initData = $this->checkTelegramHash($requestData['initData']);
+
+        $userData = $initData['user'];
 
         $user = $this->userRepository->create([
             "telegram_id" => $userData["id"],
-            "name" => $requestData->name,
+            "name" => $requestData['name'],
             'username' => $userData["username"],
-            "avatar" => $userData["avatar"],
-            "auth_date" => $userData["auth_date"],
+            "avatar" => $userData["photo_url"],
+            "auth_date" => $initData["auth_date"],
             "refresh_token" => hash('sha256', Str::random(60)),
             "refresh_token_expires_at" => now()->addDays(7)
         ]);
