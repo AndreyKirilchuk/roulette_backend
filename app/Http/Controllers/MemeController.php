@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MemeResource;
 use App\Models\Meme;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class MemeController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**

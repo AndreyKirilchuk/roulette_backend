@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MemeResource;
 use App\Models\UserMemes;
+use App\Services\MemeService;
 use Illuminate\Http\Request;
 
 class UserMemesController extends Controller
 {
+    public function __construct(
+        private readonly MemeService $memeService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +34,13 @@ class UserMemesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $meme = $this->memeService->spin();
+
+        return response()->json([
+            "data" => [
+                "meme" => MemeResource::make($meme)
+            ]
+        ], 201);
     }
 
     /**

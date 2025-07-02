@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MemeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserMemesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,8 +19,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('CheckToken')->group(function () {
-    Route::get('/check', [AuthController::class, 'get']);
+    Route::get('/profile', [UserController::class, 'profile']);
 });
+
+Route::post('/memes/spin', [UserMemesController::class, 'store']);
+
+Route::get('/users', [UserController::class, 'index']);
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);

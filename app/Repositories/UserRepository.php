@@ -26,4 +26,21 @@ class UserRepository
     {
         return User::query()->where('refresh_token', $refresh_token)->first();
     }
+
+    public function getFilteredUsers($request)
+    {
+        $users =  User::query()
+        ->where('name', 'like', '%' . $request->name . '%');
+
+        if($request->sortBy === 'count_spins')
+        {
+            $users->orderBy('count_spins', 'asc');
+        }
+        if($request->sortBy === 'count_memes')
+        {
+            $users = $users->when('user_memes', fn($q) => $q->orderBy('count', 'asc'));
+        }
+
+        return $users->get();
+    }
 }

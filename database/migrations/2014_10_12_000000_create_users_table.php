@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('auth_date');
             $table->string('refresh_token')->nullable();
             $table->timestamp('refresh_token_expires_at')->nullable();
-            $table->bigInteger('count_rotation')->default(0);
+            $table->bigInteger('count_spins')->default(0);
             $table->timestamps();
         });
     }

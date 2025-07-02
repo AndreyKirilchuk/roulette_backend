@@ -71,4 +71,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function memes()
+    {
+        return $this->belongsToMany(Meme::class, 'user_memes')->withPivot('count');
+    }
 }

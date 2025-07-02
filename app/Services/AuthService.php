@@ -87,7 +87,7 @@ class AuthService
                 user: $user,
                 data: [
                     "refresh_token" => $refreshToken,
-                    "refresh_token_expires_at" => now()->addDays(7)
+                    "refresh_token_expires_at" => now()->addDays(30)
                 ]);
         }
 
@@ -109,7 +109,7 @@ class AuthService
             "avatar" => $userData["photo_url"],
             "auth_date" => $initData["auth_date"],
             "refresh_token" => hash('sha256', Str::random(60)),
-            "refresh_token_expires_at" => now()->addDays(7)
+            "refresh_token_expires_at" => now()->addDays(30)
         ]);
 
         $user["access_token"] = JWTAuth::fromUser($user);

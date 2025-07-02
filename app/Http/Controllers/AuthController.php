@@ -115,11 +115,4 @@ class AuthController extends Controller
                 )
             );
     }
-
-    public function get()
-    {
-        return response()->json([
-            "message" => "success"
-        ]);
-    }
 }
