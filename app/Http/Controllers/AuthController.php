@@ -25,8 +25,32 @@ class AuthController extends Controller
                 "user" => UserResource::make($user),
             ]
         ])
-        ->withCookie(cookie("access_token", $user["access_token"], config('jwt.ttl')))
-        ->withCookie(cookie("refresh_token", $user["refresh_token"], 43200));
+            ->withCookie(
+                cookie(
+                    "access_token",
+                    $user["access_token"],
+                    config('jwt.ttl'),
+                    "/",
+                    ".buymysite.ru",
+                    true,
+                    true,
+                    false,
+                    "None"
+                )
+            )
+            ->withCookie(
+                cookie(
+                    "refresh_token",
+                    $user["refresh_token"],
+                    43200,
+                    "/",
+                    ".buymysite.ru",
+                    true,
+                    true,
+                    false,
+                    "None"
+                )
+            );
     }
 
     public function register(RegisterRequest $request)
@@ -40,8 +64,32 @@ class AuthController extends Controller
                 "user" => UserResource::make($user),
             ]
         ], 201)
-        ->withCookie(cookie("access_token", $user["access_token"], config('jwt.ttl')))
-        ->withCookie(cookie("refresh_token", $user["refresh_token"], 43200));
+            ->withCookie(
+                cookie(
+                    "access_token",
+                    $user["access_token"],
+                    config('jwt.ttl'),
+                    "/",
+                    ".buymysite.ru",
+                    true,
+                    true,
+                    false,
+                    "None"
+                )
+            )
+            ->withCookie(
+                cookie(
+                    "refresh_token",
+                    $user["refresh_token"],
+                    43200,
+                    "/",
+                    ".buymysite.ru",
+                    true,
+                    true,
+                    false,
+                    "None"
+                )
+            );
     }
 
     public function refresh(Request $request)
@@ -52,13 +100,26 @@ class AuthController extends Controller
 
         return response()->json([
             "message" => "Token refreshed"
-        ])->withCookie(cookie('access_token', $access_token, 60));
+        ])
+            ->withCookie(
+                cookie(
+                    "access_token",
+                    $access_token,
+                    config('jwt.ttl'),
+                    "/",
+                    ".buymysite.ru",
+                    true,
+                    true,
+                    false,
+                    "None"
+                )
+            );
     }
 
     public function get()
     {
         return response()->json([
-           "message" => "success"
+            "message" => "success"
         ]);
     }
 }
